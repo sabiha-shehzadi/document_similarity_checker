@@ -1,6 +1,8 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 from utils.helper_function import extract_text_from_pdf, clean_text, calculate_similarity
 
 st.set_page_config(page_title="Document Similarity Checker", page_icon="📚")
@@ -30,6 +32,15 @@ if uploaded_files:
     # Show as table
     df = pd.DataFrame(np.round(sim_matrix, 2), columns=file_names, index=file_names)
     st.dataframe(df)
+
+    # --- 🔥 Add Similarity Heatmap Visualization ---
+    st.write("### 🔥 Visual Similarity Heatmap")
+
+    fig, ax = plt.subplots(figsize=(6, 4))
+    sns.heatmap(df, annot=True, cmap="YlGnBu", linewidths=0.5, ax=ax)
+    st.pyplot(fig)
+    st.caption("Darker colors indicate higher similarity between documents.")
+    # --- End of Heatmap Section ---
     
     # Highlight remarks
     st.write("### 📊 Interpretation:")
