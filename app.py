@@ -5,7 +5,12 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from utils.helper_function import extract_text_from_pdf, clean_text, calculate_similarity
 
-st.set_page_config(page_title="Document Similarity Checker", page_icon="📚")
+st.set_page_config(
+    page_title="Document Similarity Checker",
+    page_icon="📚",
+    layout="wide"   # 👈 makes the app take the full width of the browser
+)
+
 
 st.title("📚 Document Similarity & Plagiarism Checker")
 st.write("Upload 2 or 3 student PDFs and check their similarity using TF-IDF & Cosine Similarity.")
