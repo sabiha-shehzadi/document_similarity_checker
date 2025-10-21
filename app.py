@@ -61,13 +61,13 @@ st.markdown("""
 # Header Section
 # ---------------------------
 st.markdown("<div class='title'>🧠 Document Similarity Analyzer</div>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>Upload multiple text files to visualize and compare their similarity using TF-IDF and cosine similarity.</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Upload multiple text or PDF files to visualize and compare their similarity using TF-IDF and cosine similarity.</div>", unsafe_allow_html=True)
 
 # ---------------------------
 # File Upload Section
 # ---------------------------
 uploaded_files = st.file_uploader(
-    "📂 Upload your text files (TXT format preferred):",
+    "📂 Upload your documents (TXT, CSV, or PDF):",
     type=["txt", "csv", "pdf"],
     accept_multiple_files=True
 )
@@ -99,12 +99,21 @@ if uploaded_files:
     st.markdown("### 📊 Similarity Matrix")
     st.dataframe(similarity_df.style.background_gradient(cmap="Blues"), use_container_width=True)
 
-    # Heatmap Visualization
+    # 🔥 Heatmap Visualization (Compact + Expandable)
     st.markdown("### 🔥 Heatmap Visualization")
-    fig, ax = plt.subplots(figsize=(8, 6))
+
+    # Small preview
+    fig_preview, ax_preview = plt.subplots(figsize=(5, 4))
     sns.heatmap(similarity_df, annot=True, cmap="coolwarm", fmt=".2f", linewidths=.5)
-    plt.title("Document Similarity Heatmap", fontsize=14)
-    st.pyplot(fig)
+    plt.title("Document Similarity (Preview)", fontsize=12)
+    st.pyplot(fig_preview, use_container_width=False)
+
+    # Expandable full-size heatmap
+    with st.expander("🔍 Click to view full-size heatmap"):
+        fig_full, ax_full = plt.subplots(figsize=(10, 8))
+        sns.heatmap(similarity_df, annot=True, cmap="coolwarm", fmt=".2f", linewidths=.5)
+        plt.title("Full-Size Document Similarity Heatmap", fontsize=14)
+        st.pyplot(fig_full, use_container_width=True)
 
     # Summary
     st.markdown("### 🧾 Summary Insights")
