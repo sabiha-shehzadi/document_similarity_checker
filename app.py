@@ -1,61 +1,105 @@
 import streamlit as st
-import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from utils.helper_function import extract_text_from_pdf, clean_text, calculate_similarity
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
+# ---------------------------
+# Page Config
+# ---------------------------
 st.set_page_config(
-    page_title="Document Similarity Checker",
-    page_icon="📚",
-    layout="wide"   # 👈 makes the app take the full width of the browser
+    page_title="📚 Document Similarity Checker",
+    page_icon="🧠",
+    layout="wide"
 )
 
+# ---------------------------
+# Custom Page Styling
+# ---------------------------
+st.markdown("""
+    <style>
+        .main {
+            background-color: #f9fafb;
+            padding: 2rem;
+            border-radius: 12px;
+        }
+        .title {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin-bottom: 2rem;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 2rem;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-st.title("📚 Document Similarity & Plagiarism Checker")
-st.write("Upload 2 or 3 student PDFs and check their similarity using TF-IDF & Cosine Similarity.")
+# ---------------------------
+# Header Section
+# ---------------------------
+st.markdown("<div class='title'>🧠 Document Similarity Analyzer</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Upload multiple text files to visualize and compare their similarity using TF-IDF and cosine similarity.</div>", unsafe_allow_html=True)
 
-uploaded_files = st.file_uploader("Upload PDF files", type=["pdf"], accept_multiple_files=True)
+# ---------------------------
+# File Upload Section
+# ---------------------------
+uploaded_files = st.file_uploader(
+    "📂 Upload your text files (TXT format preferred):",
+    type=["txt", "csv", "pdf"],
+    accept_multiple_files=True
+)
 
+# ---------------------------
+# Main Logic
+# ---------------------------
 if uploaded_files:
-    st.info("Processing uploaded PDFs... ⏳")
-    
-    # Extract and clean text
     docs = []
-    file_names = []
+    filenames = []
+
     for file in uploaded_files:
-        text = extract_text_from_pdf(file)
-        cleaned = clean_text(text)
-        docs.append(cleaned)
-        file_names.append(file.name)
-    
-    # Calculate similarity
-    sim_matrix = calculate_similarity(docs)
-    
-    st.success("✅ Similarity analysis completed!")
-    
-    # Show as table
-    df = pd.DataFrame(np.round(sim_matrix, 2), columns=file_names, index=file_names)
-    st.dataframe(df)
+        try:
+            text = file.read().decode("utf-8", errors="ignore")
+        except Exception:
+            text = str(file.read())
+        docs.append(text)
+        filenames.append(file.name)
 
-    # --- 🔥 Add Similarity Heatmap Visualization ---
-    st.write("### 🔥 Visual Similarity Heatmap")
+    # Vectorize text data
+    vectorizer = TfidfVectorizer(stop_words="english")
+    tfidf_matrix = vectorizer.fit_transform(docs)
 
-    fig, ax = plt.subplots(figsize=(6, 4))
-    sns.heatmap(df, annot=True, cmap="YlGnBu", linewidths=0.5, ax=ax)
+    # Compute similarity
+    cosine_sim = cosine_similarity(tfidf_matrix)
+    similarity_df = pd.DataFrame(cosine_sim, index=filenames, columns=filenames)
+
+    # Display results
+    st.markdown("### 📊 Similarity Matrix")
+    st.dataframe(similarity_df.style.background_gradient(cmap="Blues"), use_container_width=True)
+
+    # Heatmap Visualization
+    st.markdown("### 🔥 Heatmap Visualization")
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.heatmap(similarity_df, annot=True, cmap="coolwarm", fmt=".2f", linewidths=.5)
+    plt.title("Document Similarity Heatmap", fontsize=14)
     st.pyplot(fig)
-    st.caption("Darker colors indicate higher similarity between documents.")
-    # --- End of Heatmap Section ---
-    
-    # Highlight remarks
-    st.write("### 📊 Interpretation:")
-    for i in range(len(file_names)):
-        for j in range(i+1, len(file_names)):
-            percent = round(sim_matrix[i][j]*100, 2)
-            if percent > 80:
-                remark = "⚠️ Very High Similarity (Possible Plagiarism)"
-            elif percent > 50:
-                remark = "🟡 Moderate Similarity"
-            else:
-                remark = "🟢 Low Similarity"
-            st.write(f"**{file_names[i]} ↔ {file_names[j]}:** {percent}% → {remark}")
+
+    # Summary
+    st.markdown("### 🧾 Summary Insights")
+    st.write(f"Total documents uploaded: **{len(uploaded_files)}**")
+    st.write("The darker the red color in the heatmap, the higher the similarity between two files. Blue indicates low similarity.")
+
+# ---------------------------
+# Footer
+# ---------------------------
+st.markdown("<div class='footer'>Developed by <b>Sabiha Khan</b> | Powered by Streamlit & Scikit-Learn</div>", unsafe_allow_html=True)
