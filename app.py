@@ -101,19 +101,11 @@ if uploaded_files:
 
     # 🔥 Heatmap Visualization (Compact + Expandable)
     st.markdown("### 🔥 Heatmap Visualization")
+    fig, ax = plt.subplots(figsize=(10, 8))
+    sns.heatmap(similarity_df, annot=True, cmap="coolwarm", fmt=".2f", linewidths=.5, ax=ax)
+    plt.title("Document Similarity Heatmap", fontsize=14)
+    st.pyplot(fig, use_container_width=True)
 
-    # Small preview
-    fig_preview, ax_preview = plt.subplots(figsize=(5, 4))
-    sns.heatmap(similarity_df, annot=True, cmap="coolwarm", fmt=".2f", linewidths=.5)
-    plt.title("Document Similarity (Preview)", fontsize=12)
-    st.pyplot(fig_preview, use_container_width=False)
-
-    # Expandable full-size heatmap
-    with st.expander("🔍 Click to view full-size heatmap"):
-        fig_full, ax_full = plt.subplots(figsize=(10, 8))
-        sns.heatmap(similarity_df, annot=True, cmap="coolwarm", fmt=".2f", linewidths=.5)
-        plt.title("Full-Size Document Similarity Heatmap", fontsize=14)
-        st.pyplot(fig_full, use_container_width=True)
 
     # Summary
     st.markdown("### 🧾 Summary Insights")
