@@ -36,11 +36,23 @@ st.markdown("""
             color: #4a5568;
             margin-bottom: 2rem;
         }
+        /* Sticky Footer Styling */
         .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #edf2f7;
+            color: #2d3748;
             text-align: center;
+            padding: 10px;
             font-size: 0.9rem;
-            color: #718096;
-            margin-top: 2rem;
+            border-top: 1px solid #cbd5e0;
+            box-shadow: 0 -1px 5px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        .footer b {
+            color: #2b6cb0;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -100,6 +112,6 @@ if uploaded_files:
     st.write("The darker the red color in the heatmap, the higher the similarity between two files. Blue indicates low similarity.")
 
 # ---------------------------
-# Footer
+# Sticky Footer (always visible)
 # ---------------------------
 st.markdown("<div class='footer'>Developed by <b>Sabiha Khan</b> | Powered by Streamlit & Scikit-Learn</div>", unsafe_allow_html=True)
