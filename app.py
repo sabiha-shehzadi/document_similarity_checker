@@ -101,7 +101,7 @@ if uploaded_files:
 
     # 🔥 Heatmap Visualization (Compact + Expandable)
     st.markdown("### 🔥 Heatmap Visualization")
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(3.5, 3.5))
     sns.heatmap(similarity_df, annot=True, cmap="coolwarm", fmt=".2f", linewidths=.5, ax=ax)
     plt.title("Document Similarity Heatmap", fontsize=14)
     st.pyplot(fig, use_container_width=True)
